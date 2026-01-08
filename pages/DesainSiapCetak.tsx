@@ -25,7 +25,7 @@ import {
 const DesainSiapCetak: React.FC = () => {
   // --- 3D Simulator State ---
   const [foldProgress, setFoldProgress] = useState(0);
-  const [rotationY, setRotationY] = useState(45);
+  const [rotationY, setRotationY] = useState(0);
   const [boxColor, setBoxColor] = useState('#ffffff');
   const [bleedError, setBleedError] = useState(false);
   const [faceTexts, setFaceTexts] = useState({
@@ -151,7 +151,7 @@ const DesainSiapCetak: React.FC = () => {
 
   const resetSimulator = () => {
     setFoldProgress(0);
-    setRotationY(45);
+    setRotationY(0);
     setBoxColor('#ffffff');
     setBleedError(false);
   };
@@ -294,12 +294,45 @@ const DesainSiapCetak: React.FC = () => {
 
   // --- Styles for 3D Cube ---
   const progress = foldProgress / 100;
-  const angle = 90 * progress;
-  const offset = 75 * progress;
   const faceOpacity = 0.85 + (progress * 0.15);
   
-  const faceStyle = (transform: string) => ({
-    transform,
+  const getFaceTransform = (face: string) => {
+    // Basic cube size parameter
+    const size = 150;
+    const half = size / 2;
+    
+    // As progress goes 0 -> 1, Z moves 0 -> half (to form box center), angle 0 -> 90
+    const zBase = progress * half; 
+    const deg = progress * 90;
+    
+    switch(face) {
+        case 'front':
+            // Center piece moves forward
+            return `translateZ(${zBase}px)`;
+        case 'right':
+            // Fold Right side IN (to -Z)
+            return `translateZ(${zBase}px) translateX(${half}px) rotateY(${deg}deg) translateX(${half}px)`;
+        case 'left':
+            // Fold Left side IN (to -Z)
+            return `translateZ(${zBase}px) translateX(-${half}px) rotateY(${-deg}deg) translateX(-${half}px)`;
+        case 'top':
+            // Fold Top side IN (to -Z)
+            return `translateZ(${zBase}px) translateY(-${half}px) rotateX(${deg}deg) translateY(-${half}px)`;
+        case 'bottom':
+            // Fold Bottom side IN (to -Z)
+            return `translateZ(${zBase}px) translateY(${half}px) rotateX(${-deg}deg) translateY(${half}px)`;
+        case 'back':
+            // Attached to Bottom face. Hinge mechanism chain.
+            // 1. Position relative to Bottom edge
+            // 2. Fold relative to Bottom face
+            return `translateZ(${zBase}px) translateY(${half}px) rotateX(${-deg}deg) translateY(${size}px) rotateX(${-deg}deg) translateY(${half}px)`;
+        default: 
+            return 'none';
+    }
+  };
+
+  const faceStyle = (face: string) => ({
+    transform: getFaceTransform(face),
     backgroundColor: boxColor,
     opacity: faceOpacity,
     borderColor: bleedError ? '#ef4444' : '#94a3b8',
@@ -471,32 +504,32 @@ const DesainSiapCetak: React.FC = () => {
                     >
                        {/* Front */}
                        <div className="absolute w-[150px] h-[150px] flex items-center justify-center font-bold text-xs text-slate-600 backface-visible border border-slate-400 transition-all duration-700"
-                            style={faceStyle(`translateZ(${75 + (offset - 75)}px)`)}>
+                            style={faceStyle('front')}>
                             {faceTexts.front}
                        </div>
                        {/* Back */}
                        <div className="absolute w-[150px] h-[150px] flex items-center justify-center font-bold text-xs text-slate-600 backface-visible border border-slate-400 transition-all duration-700"
-                            style={faceStyle(`rotateY(180deg) translateZ(${75 + (offset - 75)}px) rotateY(${(1-progress)*180}deg)`)}>
+                            style={faceStyle('back')}>
                             {faceTexts.back}
                        </div>
                        {/* Right */}
                        <div className="absolute w-[150px] h-[150px] flex items-center justify-center font-bold text-xs text-slate-600 backface-visible border border-slate-400 transition-all duration-700"
-                            style={faceStyle(`rotateY(${angle}deg) translateZ(75px)`)}>
+                            style={faceStyle('right')}>
                             {faceTexts.right}
                        </div>
                        {/* Left */}
                        <div className="absolute w-[150px] h-[150px] flex items-center justify-center font-bold text-xs text-slate-600 backface-visible border border-slate-400 transition-all duration-700"
-                            style={faceStyle(`rotateY(-${angle}deg) translateZ(75px)`)}>
+                            style={faceStyle('left')}>
                             {faceTexts.left}
                        </div>
                        {/* Top */}
                        <div className="absolute w-[150px] h-[150px] flex items-center justify-center font-bold text-xs text-slate-600 backface-visible border border-slate-400 transition-all duration-700"
-                            style={faceStyle(`rotateX(${angle}deg) translateZ(75px)`)}>
+                            style={faceStyle('top')}>
                             {faceTexts.top}
                        </div>
                        {/* Bottom */}
                        <div className="absolute w-[150px] h-[150px] flex items-center justify-center font-bold text-xs text-slate-600 backface-visible border border-slate-400 transition-all duration-700"
-                            style={faceStyle(`rotateX(-${angle}deg) translateZ(75px)`)}>
+                            style={faceStyle('bottom')}>
                             {faceTexts.bottom}
                        </div>
                     </div>
@@ -520,7 +553,7 @@ const DesainSiapCetak: React.FC = () => {
                        <div>
                           <label className="block text-xs font-bold text-slate-400 uppercase mb-3">Rotasi Kamera</label>
                           <input 
-                            type="range" min="0" max="360" value={rotationY}
+                            type="range" min="-180" max="180" value={rotationY}
                             onChange={(e) => setRotationY(parseInt(e.target.value))}
                             className="w-full h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-slate-400"
                           />

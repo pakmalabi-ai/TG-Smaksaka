@@ -130,8 +130,7 @@ const ManajemenProduksiGrafika: React.FC = () => {
     // Recalculate Efficiency
     // Bottleneck logic: if print > 2 or finish > 1
     let score = 100;
-    if (tasks['print'].length > 2) score -= 20; // This logic uses OLD state, but simple enough for demo
-    // Use slightly delayed check or just rough logic for UI feedback
+    // Use the updated lists for calculation
     const printCount = targetCol === 'print' ? newTargetList.length : (sourceCol === 'print' ? newSourceList.length : tasks.print.length);
     const finishCount = targetCol === 'finish' ? newTargetList.length : (sourceCol === 'finish' ? newSourceList.length : tasks.finish.length);
     
@@ -367,11 +366,43 @@ const ManajemenProduksiGrafika: React.FC = () => {
                           const colTitle = idx === 0 ? '1. Pra-Produksi' : idx === 1 ? '2. Cetak' : idx === 2 ? '3. Finishing' : '4. Selesai (QC)';
                           const items = tasks[colKey];
                           
+                          // Styling Logic
+                          const isWarning = items.length > 2 && colKey !== 'done' && colKey !== 'pre';
+                          
+                          let containerClass = '';
+                          let titleClass = '';
+                          
+                          if (isWarning) {
+                              containerClass = 'bg-red-50 border-red-300 ring-4 ring-red-50';
+                              titleClass = 'text-red-600 font-black animate-pulse bg-red-100 rounded-lg px-2 py-1';
+                          } else {
+                              switch(colKey) {
+                                  case 'pre': 
+                                      containerClass = 'bg-gradient-to-b from-cyan-50 to-sky-50 border-sky-200 hover:border-sky-300 shadow-sm shadow-sky-100';
+                                      titleClass = 'text-sky-700 bg-sky-100 rounded-lg px-3 py-1';
+                                      break;
+                                  case 'print': 
+                                      containerClass = 'bg-gradient-to-b from-sky-50 to-blue-50 border-blue-200 hover:border-blue-300 shadow-sm shadow-blue-100';
+                                      titleClass = 'text-blue-700 bg-blue-100 rounded-lg px-3 py-1';
+                                      break;
+                                  case 'finish': 
+                                      containerClass = 'bg-gradient-to-b from-blue-50 to-indigo-50 border-indigo-200 hover:border-indigo-300 shadow-sm shadow-indigo-100';
+                                      titleClass = 'text-indigo-700 bg-indigo-100 rounded-lg px-3 py-1';
+                                      break;
+                                  case 'done': 
+                                      containerClass = 'bg-gradient-to-b from-indigo-50 to-purple-50 border-purple-200 hover:border-purple-300 shadow-sm shadow-purple-100';
+                                      titleClass = 'text-purple-700 bg-purple-100 rounded-lg px-3 py-1';
+                                      break;
+                              }
+                          }
+
                           return (
                              <div key={colKey} className="space-y-3">
-                                 <div className="text-center font-bold text-slate-400 text-xs uppercase tracking-wider">{colTitle}</div>
+                                 <div className={`text-center font-bold text-xs uppercase tracking-wider mx-auto w-fit transition-colors ${titleClass}`}>
+                                    {colTitle}
+                                 </div>
                                  <div 
-                                    className={`min-h-[300px] p-4 rounded-xl border-2 border-dashed border-slate-200 bg-slate-50 transition-colors ${items.length > 2 && colKey !== 'done' && colKey !== 'pre' ? 'bg-red-50 border-red-200' : ''}`}
+                                    className={`min-h-[350px] p-4 rounded-2xl border-2 border-dashed transition-all duration-300 ${containerClass}`}
                                     onDrop={(e) => handleDrop(e, colKey)}
                                     onDragOver={allowDrop}
                                  >
@@ -380,21 +411,30 @@ const ManajemenProduksiGrafika: React.FC = () => {
                                           key={task.id}
                                           draggable
                                           onDragStart={(e) => handleDragStart(e, task.id, colKey)}
-                                          className="bg-white p-4 rounded-xl shadow-sm border border-slate-200 cursor-grab active:cursor-grabbing hover:shadow-md hover:border-brand-200 transition-all mb-3 group"
+                                          className="bg-white p-4 rounded-xl shadow-sm border border-slate-100 cursor-grab active:cursor-grabbing hover:shadow-lg hover:-translate-y-1 transition-all mb-3 group relative overflow-hidden"
                                         >
-                                           <div className="flex justify-between items-start mb-2">
+                                           <div className={`absolute left-0 top-0 bottom-0 w-1.5 ${
+                                                colKey === 'pre' ? 'bg-sky-400' : 
+                                                colKey === 'print' ? 'bg-blue-500' :
+                                                colKey === 'finish' ? 'bg-indigo-500' : 'bg-purple-500'
+                                           }`}></div>
+
+                                           <div className="flex justify-between items-start mb-2 pl-3">
                                               {task.urgent && (
-                                                <span className="bg-orange-100 text-orange-700 text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">URGENT</span>
+                                                <span className="bg-orange-100 text-orange-700 text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse shadow-sm shadow-orange-200">URGENT</span>
                                               )}
                                               <span className="text-slate-400 text-[10px] font-mono">#{task.id}</span>
                                            </div>
-                                           <h4 className="font-bold text-sm text-slate-800 group-hover:text-brand-600 transition-colors">{task.title}</h4>
-                                           <p className="text-[10px] text-slate-500 mt-1 font-medium">{task.statusText}</p>
+                                           <h4 className="font-bold text-sm text-slate-800 group-hover:text-brand-600 transition-colors pl-3">{task.title}</h4>
+                                           <p className="text-[10px] text-slate-500 mt-1 font-medium pl-3">{task.statusText}</p>
                                         </div>
                                     ))}
                                     {items.length === 0 && (
-                                        <div className="h-full flex items-center justify-center text-slate-300 text-xs italic">
-                                           Kosong
+                                        <div className="h-full flex flex-col items-center justify-center text-slate-400/50 text-xs italic">
+                                           <div className="w-10 h-10 rounded-full border-2 border-dashed border-slate-300/50 flex items-center justify-center mb-2">
+                                              <MoveRight size={16} />
+                                           </div>
+                                           Geser kesini
                                         </div>
                                     )}
                                  </div>

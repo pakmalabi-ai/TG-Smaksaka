@@ -13,7 +13,8 @@ import {
   AlertTriangle,
   Settings,
   ShieldCheck,
-  Check
+  Check,
+  Keyboard
 } from 'lucide-react';
 
 const PurnaCetak: React.FC = () => {
@@ -117,6 +118,29 @@ const PurnaCetak: React.FC = () => {
     }
     setBindResult(result);
   };
+
+  // --- KEYBOARD LISTENER FOR CUTTING ---
+  useEffect(() => {
+    if (activeTab !== 'cutting') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Prevent default scrolling for control keys
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
+        e.preventDefault();
+      }
+
+      if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+        setCutSize(prev => Math.min(prev + 1, 400));
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+        setCutSize(prev => Math.max(prev - 1, 100));
+      } else if (e.key === ' ') {
+        handleCut();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab, handleCut]);
 
   // --- TABS DATA ---
   const tabs = [
@@ -281,7 +305,10 @@ const PurnaCetak: React.FC = () => {
               <div className="mb-8 flex items-end justify-between">
                  <div>
                    <h2 className="text-3xl font-bold text-slate-900">Stasiun Potong: Guillotine</h2>
-                   <p className="text-slate-600 mt-2">Instruksi: Atur ukuran potong, pastikan sensor aman, lalu tekan tombol potong.</p>
+                   <div className="flex items-center gap-2 mt-2 text-slate-600">
+                     <Keyboard size={16} />
+                     <p>Instruksi: Atur ukuran potong (Panah), pastikan sensor aman, lalu tekan <strong>SPASI</strong> untuk memotong.</p>
+                   </div>
                  </div>
                  <div className="bg-white px-4 py-2 rounded-lg border border-slate-200 text-xs font-bold text-slate-500 flex items-center gap-2">
                     <ShieldCheck size={16} className={sensorActive ? 'text-green-500' : 'text-slate-400'} />
@@ -304,6 +331,10 @@ const PurnaCetak: React.FC = () => {
                                 onChange={(e) => setCutSize(parseInt(e.target.value))}
                                 className="w-full mt-6 accent-brand-500 h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer" 
                               />
+                              <div className="flex justify-between text-[10px] text-slate-500 mt-2 font-mono">
+                                <span>100mm</span>
+                                <span>400mm</span>
+                              </div>
                           </div>
 
                           <div className="p-4 bg-slate-800 rounded-xl border border-slate-700 mb-6">
@@ -322,9 +353,10 @@ const PurnaCetak: React.FC = () => {
 
                       <button 
                         onClick={handleCut}
-                        className="w-full py-6 bg-red-600 hover:bg-red-500 rounded-2xl font-black text-xl uppercase tracking-tighter shadow-lg shadow-red-900/50 transition-transform active:scale-95"
+                        className="w-full py-6 bg-red-600 hover:bg-red-500 rounded-2xl font-black text-xl uppercase tracking-tighter shadow-lg shadow-red-900/50 transition-transform active:scale-95 flex flex-col items-center justify-center"
                       >
-                         TEKAN UNTUK POTONG
+                         <span>TEKAN UNTUK POTONG</span>
+                         <span className="text-[10px] opacity-70 mt-1 font-normal normal-case">(atau Spasi)</span>
                       </button>
                   </div>
 
@@ -440,31 +472,31 @@ const PurnaCetak: React.FC = () => {
                     {/* Visual Paper */}
                     <div className="flex-1 flex justify-center perspective-1000 py-10 w-full max-w-md">
                         <div 
-                          className="relative w-full aspect-[4/3] bg-white border border-slate-200 flex shadow-2xl transition-transform duration-700"
+                          className="relative w-full aspect-[4/3] bg-slate-200 border border-slate-300 flex shadow-2xl transition-transform duration-700"
                           style={{
                               transform: foldType === 'single' ? 'rotateY(20deg) rotateX(10deg)' : 'rotateX(0)'
                           }}
                         >
                             {/* Left Panel */}
                             <div 
-                              className={`fold-panel w-1/3 h-full bg-white border-r border-dashed border-slate-300 z-30 flex items-center justify-center ${foldType === 'gate' ? 'gate-folded-left' : ''}`}
+                              className={`fold-panel w-1/3 h-full bg-slate-200 border-r border-dashed border-slate-400 z-30 flex items-center justify-center ${foldType === 'gate' ? 'gate-folded-left' : ''}`}
                             >
-                                <span className="text-xs text-slate-300 font-bold uppercase">Panel A</span>
+                                <span className="text-xs text-slate-400 font-bold uppercase">Panel A</span>
                             </div>
                             
                             {/* Center Panel */}
-                            <div className="w-1/3 h-full bg-white flex items-center justify-center z-10 relative">
-                                <span className="text-xs text-slate-300 font-bold uppercase">Panel B</span>
+                            <div className="w-1/3 h-full bg-slate-200 flex items-center justify-center z-10 relative">
+                                <span className="text-xs text-slate-400 font-bold uppercase">Panel B</span>
                             </div>
 
                             {/* Right Panel */}
                             <div 
-                              className={`fold-panel w-1/3 h-full bg-white border-l border-dashed border-slate-300 z-30 flex items-center justify-center 
+                              className={`fold-panel w-1/3 h-full bg-slate-200 border-l border-dashed border-slate-400 z-30 flex items-center justify-center 
                               ${foldType === 'gate' ? 'gate-folded-right' : ''}
                               ${foldType === 'single' ? 'gate-folded-right' : ''}
                               `}
                             >
-                                <span className="text-xs text-slate-300 font-bold uppercase">Panel C</span>
+                                <span className="text-xs text-slate-400 font-bold uppercase">Panel C</span>
                             </div>
                         </div>
                     </div>

@@ -25,7 +25,7 @@ const Home: React.FC = () => {
               {/* Main Image Container */}
               <div className="relative rounded-[2rem] overflow-hidden shadow-2xl shadow-brand-200/50 border-4 border-white aspect-[3/4]">
                 <img 
-                  src="https://lh3.googleusercontent.com/pw/AP1GczMBXIeQft_IW9a9aJSEdQDHKt6U8gPfluodJtPLxGYXdZJ0Ev3Mbb8pGICCvN2-TKyGpRBxnz7u-U31LdVxSvjQ5ovA8mVfWR-DFaoJUvnxll5BNe4rwmBLDJP0f3f9dYn4Yf9EvrCX2g_TbBqGQf1B=w462-h633-s-no-gm?authuser=0"
+                  src="https://lh3.googleusercontent.com/pw/AP1GczNJ1ICgm27bF_sjUya4Hh93rRW7_5T132NZogVou_iWtKmNHF2kHmo8T-fdW_7Dvjrb_A77Qt_XI7BnbRvL2XZM7PoyFBpQINrziyRefuuc9mjstwC47NTmX3TL9vCyRe4CB0jkCdPQLWp5S7U4VEOK=w462-h633-s-no-gm?authuser=0"
                   alt="Risca Damayanti, M.Pd."
                   className="w-full h-full object-cover"
                 />

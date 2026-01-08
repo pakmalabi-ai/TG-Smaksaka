@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Sparkles, Printer, CheckCircle2, ArrowRight } from 'lucide-react';
 
 const Home: React.FC = () => {
@@ -70,10 +71,10 @@ const Home: React.FC = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center lg:items-start justify-center lg:justify-start gap-4">
-               <button className="group px-8 py-4 rounded-full bg-slate-900 text-white font-medium shadow-lg shadow-slate-200 flex items-center gap-2 hover:bg-slate-800 transition-all hover:scale-105 active:scale-95">
+               <Link to="/desain-siap-cetak" className="group px-8 py-4 rounded-full bg-slate-900 text-white font-medium shadow-lg shadow-slate-200 flex items-center gap-2 hover:bg-slate-800 transition-all hover:scale-105 active:scale-95">
                   <span>Mulai Belajar</span>
                   <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-               </button>
+               </Link>
             </div>
           </div>
 

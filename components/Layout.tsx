@@ -34,7 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="flex justify-between items-center h-16 md:h-20">
             
             {/* Logo Area */}
-            <div className="flex items-center gap-3">
+            <NavLink to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-accent-600 flex items-center justify-center text-white shadow-lg shadow-brand-200">
                 <Printer size={20} className="drop-shadow-sm" />
               </div>
@@ -42,7 +42,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <h1 className="text-xl font-display font-bold text-slate-900 leading-none tracking-tight">Teknik Grafika</h1>
                 <p className="text-[10px] uppercase tracking-widest text-brand-600 font-bold mt-1">SMK Negeri 1 Kaligondang</p>
               </div>
-            </div>
+            </NavLink>
 
             {/* Desktop Navigation */}
             <nav className="hidden lg:flex items-center gap-1">
